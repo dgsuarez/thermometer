@@ -20,7 +20,17 @@ function s:Hgst()
   call delete(tmpfile)
 endfunction
 
+function s:HgSetupStatus()
+  if exists("s:statusSet")
+    return
+  endif
+  let s:statusSet = 1
+  autocmd BufWritePost          * call s:HgResetStatusForFiles()
+  autocmd FileChangedShellPost  * call s:HgResetStatusForFiles()
+endfunction
+
 function s:HgGetStatusForFile()
+  call s:HgSetupStatus()
   let status = system('hg st ' . bufname('%'))
   if v:shell_error != 0
     return "-"
@@ -48,6 +58,7 @@ function s:HgResetStatusForFiles()
   let s:hgstatuses = {}
 endfunction
 
+
 function s:HgDiff()
   let tmpfile = tempname()
   exe "redir! > " . tmpfile
@@ -56,9 +67,6 @@ function s:HgDiff()
   execute "vert diffsplit " . tmpfile
   call delete(tmpfile)
 endfunction
-
-autocmd BufWritePost          * call s:HgResetStatusForFiles()
-autocmd FileChangedShellPost  * call s:HgResetStatusForFiles()
 
 command! -nargs=0 Hgst call s:Hgst()
 command! -nargs=0 Hgstreload call s:HgResetStatusForFiles()
