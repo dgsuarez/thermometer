@@ -48,9 +48,19 @@ function s:HgResetStatusForFiles()
   let s:hgstatuses = {}
 endfunction
 
+function s:HgDiff()
+  let tmpfile = tempname()
+  exe "redir! > " . tmpfile
+  silent echon system('hg cat ' . bufname('%'))
+  redir END
+  execute "vert diffsplit " . tmpfile
+  call delete(tmpfile)
+endfunction
+
 autocmd BufWritePost          * call s:HgResetStatusForFiles()
 autocmd FileChangedShellPost  * call s:HgResetStatusForFiles()
 
 command! -nargs=0 Hgst call s:Hgst()
 command! -nargs=0 Hgstreload call s:HgResetStatusForFiles()
+command! -nargs=0 Hgdiff call s:HgDiff()
 
