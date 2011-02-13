@@ -60,9 +60,9 @@ endfunction
 
 
 function s:HgDiff()
-  let tmpfile = tempname()
+  let tmpfile = tempname() . "." . (split(bufname("%"), '\.')[-1])  
   exe "redir! > " . tmpfile
-  silent echon system('hg cat ' . bufname('%'))
+  silent echon system("hg cat " . bufname('%'))
   redir END
   execute "vert diffsplit " . tmpfile
   call delete(tmpfile)
