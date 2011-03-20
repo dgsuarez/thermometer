@@ -58,7 +58,6 @@ function s:HgResetStatusForFiles()
   let s:hgstatuses = {}
 endfunction
 
-
 function s:HgDiff(...)
   let tmpfile = tempname() . "." . (split(bufname("%"), '\.')[-1])  
   let order = "hg cat"
@@ -71,7 +70,18 @@ function s:HgDiff(...)
   call delete(tmpfile)
 endfunction
 
+function s:HgLog(...)
+  let tmpfile = tempname() 
+  let order = "hg log"
+  let order = a:0 > 0 ? (order . " -l " . a:1) : order
+  exe "redir! > " . tmpfile
+  silent echon system(order)
+  redir END
+  execute "split " . tmpfile
+endfunction
+
 command! -nargs=0 Hgst call s:Hgst()
 command! -nargs=0 Hgstreload call s:HgResetStatusForFiles()
 command! -nargs=? Hgdiff call s:HgDiff(<f-args>)
+command! -nargs=? Hglog call s:HgLog(<f-args>)
 
