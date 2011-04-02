@@ -59,15 +59,48 @@ function s:HgResetStatusForFiles()
 endfunction
 
 function s:HgDiff(...)
+  if (!exists("s:diffs"))
+    let s:orig_diffs = {}
+    let s:tmp_diffs = {}
+  endif
   let tmpfile = tempname() . "." . (split(bufname("%"), '\.')[-1])  
+  let current_file = bufname('%')
   let order = "hg cat"
   let order = a:0 > 0 ? (order . " -r " . a:1) : order
-  let order = order . " " . bufname('%')
+  let order = order . " " . current_file
   exe "redir! > " . tmpfile
   silent echon system(order)
   redir END
+  let s:orig_diffs[current_file] = tmpfile
+  let s:tmp_diffs[tmpfile] = current_file
   execute "vert diffsplit " . tmpfile
-  call delete(tmpfile)
+endfunction
+
+function s:HgDiffoffBuffer()
+  if !exists("s:orig_diffs")
+    return
+  endif
+  let current = bufname('%')
+  if has_key(s:orig_diffs, current)
+    let diff = s:orig_diffs[current]
+    call s:HgDiffOff(current, diff)
+    call remove(s:orig_diffs, current)
+    call remove(s:tmp_diffs, diff)
+  endif
+  if has_key(s:tmp_diffs, current)
+    let real = s:tmp_diffs[current]
+    call s:HgDiffOff(real, current)
+    call remove(s:orig_diffs, real)
+    call remove(s:tmp_diffs, current)
+  endif
+endfunction
+
+function s:HgDiffOff(real, diff)
+  execute 'bwipeout ' . a:diff
+  execute 'buffer ' . a:real
+  execute "diffoff"
+  call delete(a:diff)
+
 endfunction
 
 function s:HgLog(...)
@@ -83,5 +116,6 @@ endfunction
 command! -nargs=0 Hgst call s:Hgst()
 command! -nargs=0 Hgstreload call s:HgResetStatusForFiles()
 command! -nargs=? Hgdiff call s:HgDiff(<f-args>)
+command! -nargs=0 Hgdiffoff call s:HgDiffoffBuffer(<f-args>)
 command! -nargs=? Hglog call s:HgLog(<f-args>)
 
