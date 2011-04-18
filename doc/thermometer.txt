@@ -1,0 +1,36 @@
+*thermometer.vim* Check your Mercurial repos from vim
+
+Author: Diego Guerra <https://github.com/dgsuarez>
+License: www.opensource.org/licenses/bsd-license.php
+
+INTRODUCTION                                          *thermometer*
+
+Diff, log and get the status of your mercurial repository right from within vim. 
+
+COMMANDS                                              *thermometer-commands*
+
+                                                      *thermometer-Hgst*
+:Hgst             to open a quickfix window with changes to the repository
+
+                                                      *thermometer-Hgstreload*
+:Hgstreload       to reset status data used in statusline function
+
+                                                      *thermometer-Hgdiff*
+:Hgdiff [rev]     to diff the current buffer with its last version on the repository, 
+                  or with a particular revision if a revision number is provided
+
+                                                      *thermometer-Hgdiffoff*
+:Hgdiffoff        to diffoff the current diff
+
+                                                      *thermometer-Hglog*
+:Hglog [n]        to show the repository's log, can receive an optional parameter 
+                  to limit the number of revisions shown
+
+STATUSLINE                                            *thermometer-statusline*
+
+Add g:HgStatusForFile() to your statusline to get status (M, ?, A...) information
+in your statusline.
+
+ABOUT                                                 *thermometer-about*
+
+Please, report bugs and request new features in https://github.com/dgsuarez/thermometer
