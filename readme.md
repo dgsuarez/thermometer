@@ -1,7 +1,8 @@
 Readme
 ======
 
-Thermometer is a vim plugin for mercurial users. Right now is in alpha state.
+Thermometer is a vim plugin for mercurial users.
+
 Available commands are:
 
 * Hgst to open a quickfix window with changes to the repository

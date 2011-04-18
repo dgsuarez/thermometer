@@ -59,7 +59,7 @@ function s:HgResetStatusForFiles()
 endfunction
 
 function s:HgDiff(...)
-  if (!exists("s:diffs"))
+  if !exists("s:orig_diffs")
     let s:orig_diffs = {}
     let s:tmp_diffs = {}
   endif
@@ -84,14 +84,10 @@ function s:HgDiffoffBuffer()
   if has_key(s:orig_diffs, current)
     let diff = s:orig_diffs[current]
     call s:HgDiffOff(current, diff)
-    call remove(s:orig_diffs, current)
-    call remove(s:tmp_diffs, diff)
   endif
   if has_key(s:tmp_diffs, current)
     let real = s:tmp_diffs[current]
     call s:HgDiffOff(real, current)
-    call remove(s:orig_diffs, real)
-    call remove(s:tmp_diffs, current)
   endif
 endfunction
 
@@ -99,6 +95,8 @@ function s:HgDiffOff(real, diff)
   execute 'bwipeout ' . a:diff
   execute 'buffer ' . a:real
   execute "diffoff"
+  call remove(s:orig_diffs, a:real)
+  call remove(s:tmp_diffs, a:diff)
   call delete(a:diff)
 
 endfunction
