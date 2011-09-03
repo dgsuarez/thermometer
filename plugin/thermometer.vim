@@ -62,25 +62,30 @@ function s:HgDiff(...)
   if !exists("s:orig_diffs")
     let s:orig_diffs = {}
     let s:tmp_diffs = {}
+    let s:tmp_diffs_names = {}
   endif
   let tmpfile = tempname() . "." . (split(bufname("%"), '\.')[-1])  
   let current_file = bufname('%')
+  let current_file_nr = bufnr('%')
   let order = "hg cat"
   let order = a:0 > 0 ? (order . " -r " . a:1) : order
   let order = order . " " . current_file
   exe "redir! > " . tmpfile
   silent echon system(order)
   redir END
-  let s:orig_diffs[current_file] = tmpfile
-  let s:tmp_diffs[tmpfile] = current_file
   execute "vert diffsplit " . tmpfile
+
+  let tmpfile_nr = bufnr('%')
+  let s:orig_diffs[current_file_nr] = tmpfile_nr
+  let s:tmp_diffs[tmpfile_nr]       = current_file_nr
+  let s:tmp_diffs_names[tmpfile_nr] = tmpfile
 endfunction
 
 function s:HgDiffoffBuffer()
   if !exists("s:orig_diffs")
     return
   endif
-  let current = bufname('%')
+  let current = bufnr('%')
   if has_key(s:orig_diffs, current)
     let diff = s:orig_diffs[current]
     call s:HgDiffOff(current, diff)
@@ -97,7 +102,7 @@ function s:HgDiffOff(real, diff)
   execute "diffoff"
   call remove(s:orig_diffs, a:real)
   call remove(s:tmp_diffs, a:diff)
-  call delete(a:diff)
+  call delete(s:tmp_diffs_names[a:diff])
 
 endfunction
 
