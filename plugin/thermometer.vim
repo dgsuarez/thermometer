@@ -15,7 +15,7 @@ function s:Hgst()
   let old_efm = &errorformat
   set errorformat=%m\ %f
   execute "silent! cfile " . tmpfile
-  let errorformat = old_efm
+  let &errorformat = old_efm
   botright copen
   call delete(tmpfile)
 endfunction
