@@ -54,6 +54,17 @@ function g:HgStatusForFile()
   return s:hgstatuses[ bufname('%') ]
 endfunction
 
+function g:HgStatusLine()
+  let status = g:HgStatusForFile()
+  if status == "-"
+    return ""
+  endif
+  if status == ""
+    return "[Hg]"
+  endif
+  return "[Hg " . status . "]"
+endfunction
+
 function s:HgResetStatusForFiles()
   let s:hgstatuses = {}
 endfunction
