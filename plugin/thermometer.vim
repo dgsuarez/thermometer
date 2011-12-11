@@ -127,9 +127,23 @@ function s:HgLog(...)
   execute "split " . tmpfile
 endfunction
 
+function s:HgBlame(l1, ...)
+  let tmpfile = tempname() 
+  let order = "hg blame -u -n -d -q"
+  let order = a:0 > 0 ? (order . " -r " . a:1) : order
+  let order = order . " " . bufname('%')
+  exe "redir! > " . tmpfile
+  silent echon system(order)
+  redir END
+  execute "split " . tmpfile
+  execute ":" . a:l1
+
+endfunction
+
 command! -nargs=0 Hgst call s:Hgst()
 command! -nargs=0 Hgstreload call s:HgResetStatusForFiles()
 command! -nargs=? Hgdiff call s:HgDiff(<f-args>)
 command! -nargs=0 Hgdiffoff call s:HgDiffoffBuffer(<f-args>)
 command! -nargs=? Hglog call s:HgLog(<f-args>)
+command! -nargs=? -range=% Hgblame call s:HgBlame(<line1>, <f-args>)
 
