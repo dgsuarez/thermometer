@@ -119,12 +119,17 @@ endfunction
 
 function s:HgLog(...)
   let tmpfile = tempname() 
-  let order = "hg log"
+  let current_file = bufname('%')
+  let order = "hg log " . current_file
   let order = a:0 > 0 ? (order . " -l " . a:1) : order
   exe "redir! > " . tmpfile
   silent echon system(order)
   redir END
-  execute "split " . tmpfile
+  if current_file == ""
+    execute "e " . tmpfile
+  else
+    execute "split " . tmpfile
+  endif
 endfunction
 
 function s:HgBlame(l1, ...)
