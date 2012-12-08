@@ -29,7 +29,7 @@ endfunction
 function s:HgGetStatusForFile()
   let status = system('hg st ' . bufname('%'))
   if v:shell_error != 0
-    return "-"
+    return -1
   endif
   if (strlen(status) == 0)
     return ""
@@ -52,15 +52,23 @@ function s:HgResetCaches()
   let s:hgstatuses = {}
 endfunction
 
-function g:HgRevInfo()
+function s:GetHgRevInfo()
   if ! exists('g:HgRevInfoTemplate')
     let g:HgRevInfoTemplate = "({branch})"
   endif
   if g:HgRevInfoTemplate == ""
     return ""
   endif
+  let revinfo = system('hg log -r . --template "' . g:HgRevInfoTemplate .  '"')
+  if v:shell_error != 0
+    return -1
+  endif
+  return revinfo
+endfunction
+
+function g:HgRevInfo()
   if ! exists('s:hgworkinginfo')
-    let s:hgworkinginfo = system('hg log -r . --template "' . g:HgRevInfoTemplate .  '"')
+    let s:hgworkinginfo = s:GetHgRevInfo()
   endif
   return s:hgworkinginfo
 endfunction
@@ -68,7 +76,7 @@ endfunction
 function g:HgStatusLine()
   let status = g:HgStatusForFile()
   let rev_info = g:HgRevInfo()
-  if status == "-"
+  if status == -1 || rev_info == -1
     return ""
   endif
   if status == ""
