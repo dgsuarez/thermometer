@@ -16,17 +16,17 @@ function s:Hgst()
   botright lopen
 endfunction
 
-function s:HgSetupStatus()
-  if exists("s:statusSet")
+function s:HgSetupCaches()
+  if exists("s:cachesSet")
     return
   endif
-  let s:statusSet = 1
-  autocmd BufWritePost          * call s:HgResetStatusForFiles()
-  autocmd FileChangedShellPost  * call s:HgResetStatusForFiles()
+  let s:cachesSet = 1
+  let s:hgstatuses = {}
+  autocmd BufWritePost          * call s:HgResetCaches()
+  autocmd FileChangedShellPost  * call s:HgResetCaches()
 endfunction
 
 function s:HgGetStatusForFile()
-  call s:HgSetupStatus()
   let status = system('hg st ' . bufname('%'))
   if v:shell_error != 0
     return "-"
@@ -41,28 +41,40 @@ function g:HgStatusForFile()
   if strlen(bufname('%')) == 0
     return ""
   endif
-  if ! exists('s:hgstatuses')
-    let s:hgstatuses = {}
-  endif
   if ! has_key(s:hgstatuses, bufname('%'))
     let s:hgstatuses[ bufname('%') ] = s:HgGetStatusForFile()
   endif
   return s:hgstatuses[ bufname('%') ]
 endfunction
 
+function s:HgResetCaches()
+  unlet s:hgworkinginfo
+  let s:hgstatuses = {}
+endfunction
+
+function g:HgRevInfo()
+  if ! exists('g:HgRevInfoTemplate')
+    let g:HgRevInfoTemplate = "({branch})"
+  endif
+  if g:HgRevInfoTemplate == ""
+    return ""
+  endif
+  if ! exists('s:hgworkinginfo')
+    let s:hgworkinginfo = system('hg log -r . --template "' . g:HgRevInfoTemplate .  '"')
+  endif
+  return s:hgworkinginfo
+endfunction
+
 function g:HgStatusLine()
   let status = g:HgStatusForFile()
+  let rev_info = g:HgRevInfo()
   if status == "-"
     return ""
   endif
   if status == ""
-    return "[Hg]"
+    return "[Hg ". rev_info ."]"
   endif
-  return "[Hg " . status . "]"
-endfunction
-
-function s:HgResetStatusForFiles()
-  let s:hgstatuses = {}
+  return "[Hg " . status . " " . rev_info . "]"
 endfunction
 
 function s:HgDiff(...)
@@ -140,8 +152,10 @@ function s:HgBlame(l1, ...)
 
 endfunction
 
+call s:HgSetupCaches()
 command! -nargs=0 Hgst call s:Hgst()
-command! -nargs=0 Hgstreload call s:HgResetStatusForFiles()
+command! -nargs=0 Hgstreload call s:HgResetCaches()
+command! -nargs=0 Hgreset call s:HgResetCaches()
 command! -nargs=? Hgdiff call s:HgDiff(<f-args>)
 command! -nargs=0 Hgdiffoff call s:HgDiffoffBuffer(<f-args>)
 command! -nargs=? Hglog call s:HgLog(<f-args>)
