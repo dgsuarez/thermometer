@@ -117,30 +117,29 @@ function s:HgDiffOff(real, diff)
 
 endfunction
 
+function s:RunInSplit(order)
+  let current_file = bufname('%')
+  if bufname("%") != ""
+    execute "new"
+  endif
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
+  execute "0read !" . a:order
+  setlocal nomodifiable
+  execute "normal! gg<CR>"
+endfunction
+
 function s:HgLog(...)
-  let tmpfile = tempname() 
   let current_file = bufname('%')
   let order = "hg log " . current_file
   let order = a:0 > 0 ? (order . " -l " . a:1) : order
-  exe "redir! > " . tmpfile
-  silent echon system(order)
-  redir END
-  if current_file == ""
-    execute "e " . tmpfile
-  else
-    execute "split " . tmpfile
-  endif
+  call s:RunInSplit(order)
 endfunction
 
 function s:HgBlame(l1, ...)
-  let tmpfile = tempname() 
   let order = "hg blame -u -n -d -q"
   let order = a:0 > 0 ? (order . " -r " . a:1) : order
   let order = order . " " . bufname('%')
-  exe "redir! > " . tmpfile
-  silent echon system(order)
-  redir END
-  execute "split " . tmpfile
+  call s:RunInSplit(order)
   execute ":" . a:l1
 
 endfunction
