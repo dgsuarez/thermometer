@@ -11,6 +11,8 @@ Available commands are:
 * `Hglog` to show a file's log, or, if no file is being edited the full log. Can receive an optional parameter to limit the number of commits shown.
 * `Hgblame` to show blame information for each line.
 
-The plugin also provides the function `g:HgStatusForFile()` to be used in statuslines, e.g. in your vimrc:
+The plugin also provides functions to be used in statuslines, e.g. in your vimrc:
 
     set statusline+=%{g:HgStatusLine()}
+
+For more information take a look at the documentation.
