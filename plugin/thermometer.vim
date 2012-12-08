@@ -8,16 +8,12 @@ endif
 let loaded_thermometer = 1
 
 function s:Hgst()
-  let tmpfile = tempname()
-  exe "redir! > " . tmpfile
-  silent echon system('hg st')
-  redir END
+  let res = system('hg st')
   let old_efm = &errorformat
   set errorformat=%m\ %f
-  execute "silent! cfile " . tmpfile
+  execute "silent! lgetexpr res" 
   let &errorformat = old_efm
-  botright copen
-  call delete(tmpfile)
+  botright lopen
 endfunction
 
 function s:HgSetupStatus()
