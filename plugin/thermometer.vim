@@ -7,7 +7,7 @@ if exists("loaded_thermometer")
 endif
 let loaded_thermometer = 1
 
-function s:Hgst()
+function s:HgStatus()
   let res = system('hg st')
   let old_efm = &errorformat
   set errorformat=%m\ %f
@@ -166,7 +166,8 @@ function s:HgSummary(...)
 endfunction
 
 call s:HgSetupCaches()
-command! -nargs=0 Hgst call s:Hgst()
+command! -nargs=0 Hgst call s:HgStatus()
+command! -nargs=0 Hgstatus call s:HgStatus()
 command! -nargs=0 Hgstreload call s:HgResetCaches()
 command! -nargs=0 Hgreset call s:HgResetCaches()
 command! -nargs=? Hgdiff call s:HgDiff(<f-args>)
