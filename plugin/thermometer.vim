@@ -157,7 +157,11 @@ function s:HgBlame(l1, ...)
   let order = order . " " . bufname('%')
   call s:RunInSplit(order)
   execute ":" . a:l1
+endfunction
 
+function s:HgSummary(...)
+  let order = "hg summary --remote"
+  call s:RunInSplit(order)
 endfunction
 
 call s:HgSetupCaches()
@@ -168,4 +172,5 @@ command! -nargs=? Hgdiff call s:HgDiff(<f-args>)
 command! -nargs=0 Hgdiffoff call s:HgDiffoffBuffer(<f-args>)
 command! -nargs=? Hglog call s:HgLog(<f-args>)
 command! -nargs=? -range=% Hgblame call s:HgBlame(<line1>, <f-args>)
+command! -nargs=0 Hgsummary call s:HgSummary()
 
