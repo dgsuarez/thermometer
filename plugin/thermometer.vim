@@ -140,6 +140,7 @@ function s:RunInSplit(order)
   endif
   setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
   execute "0read !" . a:order
+  silent file `=a:order`
   setlocal nomodifiable
   execute "normal! gg<CR>"
 endfunction
