@@ -21,7 +21,7 @@ function s:HgSetupCaches()
     return
   endif
   let s:cachesSet = 1
-  let s:hgstatuses = {}
+  call s:HgResetCaches()
   autocmd BufWritePost          * call s:HgResetCaches()
   autocmd FileChangedShellPost  * call s:HgResetCaches()
 endfunction
@@ -48,7 +48,7 @@ function g:HgStatusForFile()
 endfunction
 
 function s:HgResetCaches()
-  unlet s:hgworkinginfo
+  let s:hgworkinginfo = -2
   let s:hgstatuses = {}
 endfunction
 
@@ -67,7 +67,7 @@ function s:GetHgRevInfo()
 endfunction
 
 function g:HgRevInfo()
-  if ! exists('s:hgworkinginfo')
+  if s:hgworkinginfo == -2
     let s:hgworkinginfo = s:GetHgRevInfo()
   endif
   return s:hgworkinginfo
